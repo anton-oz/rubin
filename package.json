@@ -1,0 +1,25 @@
+{
+  "name": "greta-ts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./build/index.js",
+  "type": "module",
+  "bin": {
+    "greta": "./build/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "main": "pnpm build && node build/index.js",
+    "dev": "node src/index.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.8.0",
+  "dependencies": {
+    "openai": "^4.93.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.14.0"
+  }
+}
