@@ -1,17 +1,12 @@
-import * as readline from "node:readline/promises";
-import { getModelName } from "./logic/api/index.ts";
-
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+import { getModelName } from "@/logic/api/index";
+import { gretaPrompt } from "./logic/prompt";
+import { createConvo } from "./logic/filesystem";
 
 const main = async () => {
-  getModelName();
-
+  const modelName = await getModelName();
+  await createConvo();
   while (true) {
-    const question = await rl.question("Enter Question: ");
-    console.log(question);
+    await gretaPrompt(modelName);
   }
 };
 
