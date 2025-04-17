@@ -42,7 +42,7 @@ export const dirArray = async (dirPath: string): Promise<string[]> => {
 /**
  * check if directory exists
  */
-export const dirExists = (dirPath: string) => {
+export const fileExists = (dirPath: string) => {
   return fs.existsSync(dirPath);
 };
 
