@@ -7,6 +7,7 @@ import {
   createDir,
   currentDateDir,
   dirArray,
+  readAndParseJson,
 } from "./resources";
 import {
   ChatCompletionMessageParam,
@@ -105,6 +106,7 @@ export const addToConvo = async (
 
   convoArr.push(question, answer);
   convoState.setHistory(convoArr);
+
   fs.writeFile(convoJsonPath, JSON.stringify(convoArr), (err) => {
     if (err) throw err;
   });
@@ -117,11 +119,11 @@ export const addToConvo = async (
 export const switchConvo = async (convoNum: number) => {
   convoState.setNum(convoNum);
   convoState.setDir(convoNum.toString());
+
   const currentConvo = convoState.getDir();
-  let history: ChatCompletionMessageParam[] = [];
-  fs.readFile(`${currentConvo}/conversation.json`, (err, data) => {
-    if (err) throw err;
-    console.log(data);
-  });
+  const convoJsonPath = `${currentConvo}/conversation.json`;
+  const history = await readAndParseJson(convoJsonPath);
+
   convoState.setHistory(history);
+  console.log(`current convo: ${currentConvo}\n` + "---");
 };

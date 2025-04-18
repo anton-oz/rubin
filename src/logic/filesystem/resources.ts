@@ -58,3 +58,16 @@ export const createDir = async (dirPath: string) => {
     process.exit(0);
   }
 };
+
+/**
+ * ASYNC! Read and parse json file
+ */
+export const readAndParseJson = async (filePath: string) => {
+  try {
+    const content = await fsp.readFile(filePath, { encoding: "utf-8" });
+    return JSON.parse(content);
+  } catch (e) {
+    console.error(e);
+    process.exit(0);
+  }
+};

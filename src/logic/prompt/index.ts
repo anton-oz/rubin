@@ -1,6 +1,6 @@
 import * as readline from "node:readline/promises";
 import { getAnswer } from "../api";
-import { addToConvo, convoState } from "../filesystem";
+import { addToConvo, convoState, switchConvo } from "../filesystem";
 
 /**
  * function for prompting user
@@ -23,13 +23,46 @@ const isExitCommand = (input: string): input is ExitCommand => {
   return exitCommands.has(input as ExitCommand);
 };
 
+const showHelp = () => {
+  // prettier-ignore
+  console.log(
+    "\n" +
+    "'h', 'help' -- display this help menu\n" +
+    "'exit', 'q' -- quit program\n" +
+    "commands: \n" +
+    "  file -- enter file path for greta to read\n" +
+    "  new -- create a new conversation\n" +
+    "\n"
+  )
+};
+/**
+ * available commands
+ */
+type Command = "h" | "help" | "switch" | "file" | "new";
+const commands = new Set<Command>(["h", "help", "switch", "file", "new"]);
+/**
+ * check if command is available
+ */
+const isCommand = (input: string): input is Command => {
+  return commands.has(input as Command);
+};
+
 /**
  * if command matches a case do the thing and continue the prompt loop
  */
-const isCommand = async (command: string) => {
+const processCommand = async (command: Command) => {
   switch (command) {
+    case "h":
+    case "help":
+      showHelp();
+      break;
     case "switch":
-      const convoNum = rl.question("Enter convo num: ");
+      const input = await rl.question("Enter convo num: ");
+      const convoNum = parseInt(input);
+      await switchConvo(convoNum);
+      break;
+    default:
+      break;
   }
 };
 
@@ -38,21 +71,31 @@ const isCommand = async (command: string) => {
  * user via cli
  */
 export const gretaPrompt = async (modelName: string) => {
-  const question = await rl.question("Enter Question: ");
-  if (isExitCommand(question)) {
-    process.exit(0);
+  while (true) {
+    const question = await rl
+      .question("Enter Question: ")
+      .then((input) => input.trim());
+
+    if (isExitCommand(question)) {
+      process.exit(0);
+    }
+    if (isCommand(question)) {
+      await processCommand(question);
+      continue;
+    }
+
+    const history = convoState.getHistory();
+    let answer;
+    if (history.length > 1) {
+      answer = await getAnswer(modelName, question, history);
+    } else {
+      answer = await getAnswer(modelName, question);
+    }
+    if (!answer) {
+      console.error("Ran into problem with answer");
+      process.exit(1);
+    }
+    addToConvo(question, answer);
+    console.log(`\n${answer}\n`);
   }
-  const history = convoState.getHistory();
-  let answer;
-  if (history.length > 1) {
-    answer = await getAnswer(modelName, question, history);
-  } else {
-    answer = await getAnswer(modelName, question);
-  }
-  if (!answer) {
-    console.error("Ran into problem with answer");
-    process.exit(1);
-  }
-  addToConvo(question, answer);
-  console.log(`\n${answer}\n`);
 };

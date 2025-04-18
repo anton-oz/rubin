@@ -5,9 +5,7 @@ import { createConvo } from "./logic/filesystem";
 const main = async () => {
   const modelName = await getModelName();
   await createConvo();
-  while (true) {
-    await gretaPrompt(modelName);
-  }
+  gretaPrompt(modelName);
 };
 
 main();
