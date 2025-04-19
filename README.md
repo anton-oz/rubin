@@ -1,6 +1,6 @@
 # Greta
 
-![size](https://img.shields.io/github/repo-size/anton-oz/greta?style=for-the-badge&logoColor=%23b4befe)
+![size](https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square)
 
 greta is an open source tool for cli llm inference.
 
