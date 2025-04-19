@@ -1,3 +1,30 @@
 # Greta
 
-Greta is a cli tool for asking quick questions, performing quick tasks, or anything else you design it to do.
+![size](https://img.shields.io/github/repo-size/anton-oz/greta-ts?style=for-the-badge&logoColor=%23b4befe)
+
+greta is an open source tool for cli llm inference.
+
+## Installation
+
+### Dependencies
+
+- [pnpm](https://pnpm.io/installation)
+
+- [tsx](https://tsx.is/)
+
+### Quick Start
+
+```bash
+git clone git@github.com:anton-oz/greta
+cd greta
+pnpm i
+
+# create a local build
+pnpm prod
+
+# run the local build
+pnpm main
+
+# or link the build to be available globally
+pnpm link -g
+```

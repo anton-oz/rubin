@@ -1,6 +1,8 @@
+#!/usr/bin/env tsx
+
 import { getModelName } from "@/logic/api/index";
-import { gretaPrompt } from "./logic/prompt";
-import { createConvo } from "./logic/filesystem";
+import { gretaPrompt } from "@/logic/prompt";
+import { createConvo } from "@/logic/filesystem";
 
 const main = async () => {
   const modelName = await getModelName();

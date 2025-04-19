@@ -1,24 +1,29 @@
 {
-  "name": "greta-ts",
+  "name": "greta",
   "version": "1.0.0",
   "description": "",
-  "type": "es2022",
+  "type": "module",
+  "bin": {
+    "greta": "./build/index.js"
+  },
   "scripts": {
     "build": "tsc",
-    "build:main": "pnpm build && node build/index.js",
-    "main": "node build/index.js",
+    "build:watch": "tsc -w",
+    "build:start": "pnpm build && pnpm start",
+    "start": "pnpm tsx build/index.js",
     "dev": "pnpm tsx src/index.ts",
-    "clean": "rm -rf convos"
+    "prod": "pnpm build && chmod +x build/index.js",
+    "clean:convos": "rm -rf convos"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.8.0",
+  "packageManager": "pnpm@10.8.1",
   "dependencies": {
-    "openai": "^4.93.0"
+    "openai": "^4.93.0",
+    "tsx": "^4.19.3"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0",
-    "tsx": "^4.19.3"
+    "@types/node": "^22.14.0"
   }
 }

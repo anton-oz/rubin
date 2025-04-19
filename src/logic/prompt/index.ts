@@ -1,6 +1,6 @@
 import * as readline from "node:readline/promises";
-import { getAnswer } from "../api";
-import { addToConvo, convoState, switchConvo } from "../filesystem";
+import { getAnswer } from "@/logic/api";
+import { addToConvo, convoState, switchConvo } from "@/logic/filesystem";
 
 /**
  * function for prompting user
