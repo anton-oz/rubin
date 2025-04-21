@@ -72,16 +72,42 @@ class ConvoState {
 
 export const convoState = await ConvoState.init();
 
+export const isConvoEmpty = async (filePath: string): Promise<boolean> => {
+  const convo = await readAndParseJson(filePath);
+  if (convo.length === 0) {
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const getLastConvoPath = async () => {
+  const currentDateDir = convoState.getDateDir();
+  const convos = await dirArray(currentDateDir);
+
+  if (convos.length === 0) {
+    return;
+  }
+  const lastConvoPath = `${currentDateDir}/${convos.length}/convo.json`;
+
+  return path.normalize(lastConvoPath);
+};
+
 export const createConvo = async () => {
   const currentDateDir = convoState.getDateDir();
   const convos = await dirArray(currentDateDir);
 
   const newConvoNum = convos.length + 1;
   const newConvoDir = path.normalize(`${currentDateDir}/${newConvoNum}`);
-  createDir(newConvoDir);
+  await createDir(newConvoDir);
   convoState.setNum(newConvoNum);
   convoState.setDir(newConvoDir);
   convoState.setHistory([]);
+
+  // init a convo.json to prevent errors when switching conversations
+  fs.writeFile(`${newConvoDir}/convo.json`, "[]", (err) => {
+    if (err) throw err;
+  });
 
   console.log(`Current convo: ${newConvoNum}`);
   console.log(`Location: ${newConvoDir}`);
@@ -95,7 +121,7 @@ export const addQuestionToConvo = (questionContent: string) => {
   };
 
   const convoDir = convoState.getDir();
-  const convoJsonPath = `${convoDir}/conversation.json`;
+  const convoJsonPath = `${convoDir}/convo.json`;
   const convoArr = convoState.getHistory();
 
   convoArr.push(question);
@@ -113,7 +139,7 @@ export const addAnswerToConvo = (answerContent: string) => {
   };
 
   const convoDir = convoState.getDir();
-  const convoJsonPath = `${convoDir}/conversation.json`;
+  const convoJsonPath = `${convoDir}/convo.json`;
   const convoArr = convoState.getHistory();
 
   convoArr.push(answer);
@@ -124,9 +150,6 @@ export const addAnswerToConvo = (answerContent: string) => {
   });
 };
 
-/**
- * Creates markdown file and returns the file location
- */
 export const writeMarkdown = (filePath: string, content: string) => {
   fs.writeFile(`${filePath}/last_answer.md`, content, (err) => {
     if (err) throw err;
@@ -139,13 +162,19 @@ export const writeMarkdown = (filePath: string, content: string) => {
  * the current conversation.
  */
 export const switchConvo = async (convoNum: number) => {
-  convoState.setNum(convoNum);
   const currentDateDir = convoState.getDateDir();
+
+  const convos = await dirArray(currentDateDir);
+  if (convoNum > convos.length) {
+    console.log("\nThat conversation does not exist.\n");
+    return;
+  }
+
+  convoState.setNum(convoNum);
   convoState.setDir(`${currentDateDir}/${convoNum.toString()}`);
 
   const currentConvo = convoState.getDir();
-  console.log(currentConvo);
-  const convoJsonPath = `${currentConvo}/conversation.json`;
+  const convoJsonPath = `${currentConvo}/convo.json`;
   const history = await readAndParseJson(convoJsonPath);
 
   convoState.setHistory(history);

@@ -2,11 +2,18 @@
 
 import { getModelName } from "@/logic/api/index";
 import { gretaPrompt } from "@/logic/prompt";
-import { createConvo } from "@/logic/filesystem";
+import {
+  createConvo,
+  getLastConvoPath,
+  isConvoEmpty,
+} from "@/logic/filesystem";
 
 const main = async () => {
   const modelName = await getModelName();
-  await createConvo();
+  const lastConvo = await getLastConvoPath();
+  if (!lastConvo || !isConvoEmpty(lastConvo)) {
+    await createConvo();
+  }
   gretaPrompt(modelName);
 };
 

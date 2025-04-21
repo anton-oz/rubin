@@ -60,7 +60,7 @@ export const createDir = async (dirPath: string) => {
 };
 
 /**
- * ASYNC! Read and parse json file
+ * ASYNC! Read and return parsed json file
  */
 export const readAndParseJson = async (filePath: string) => {
   try {

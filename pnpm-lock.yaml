@@ -14,13 +14,13 @@ importers:
       openai:
         specifier: ^4.93.0
         version: 4.95.1
-      tsx:
-        specifier: ^4.19.3
-        version: 4.19.3
     devDependencies:
       '@types/node':
         specifier: ^22.14.0
         version: 22.14.1
+      tsx:
+        specifier: ^4.19.3
+        version: 4.19.3
       typescript:
         specifier: ^5.8.3
         version: 5.8.3

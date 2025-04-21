@@ -32,19 +32,20 @@ export const showHelp = () => {
     "commands: \n" +
     "  file -- enter file path for greta to read\n" +
     "  new -- create a new conversation\n" +
-    "\n"
-  )
+    "  clear -- clear the screen\n"
+   );
 };
 /**
  * available commands
  */
-export type Command = "h" | "help" | "switch" | "file" | "new";
+export type Command = "h" | "help" | "switch" | "file" | "new" | "clear";
 export const commands = new Set<Command>([
   "h",
   "help",
   "switch",
   "file",
   "new",
+  "clear",
 ]);
 /**
  * check if command is available
@@ -69,6 +70,9 @@ export const processCommand = async (command: Command) => {
       break;
     case "new":
       await createConvo();
+      break;
+    case "clear":
+      console.clear();
       break;
     default:
       break;
