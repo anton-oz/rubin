@@ -41,12 +41,10 @@ export const getAnswer = async (
     content: question,
   };
 
-  if (history) history.push(message);
-
   try {
     const response = await client.chat.completions.create({
       model,
-      messages: history || [{ role: "user", content: question }],
+      messages: history ? history : [message],
     });
 
     const answer = response.choices[0].message.content;

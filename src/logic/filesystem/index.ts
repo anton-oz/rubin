@@ -1,6 +1,5 @@
 import path from "path";
 import fs from "fs";
-import { fileURLToPath } from "url";
 import {
   convosDir,
   fileExists,
@@ -82,29 +81,42 @@ export const createConvo = async () => {
   createDir(newConvoDir);
   convoState.setNum(newConvoNum);
   convoState.setDir(newConvoDir);
+  convoState.setHistory([]);
 
   console.log(`Current convo: ${newConvoNum}`);
-  console.log(`Location ${newConvoDir}`);
+  console.log(`Location: ${newConvoDir}`);
   console.log("---");
 };
 
-export const addToConvo = async (
-  questionContent: string,
-  answerContent: string,
-) => {
+export const addQuestionToConvo = (questionContent: string) => {
   const question: ChatCompletionUserMessageParam = {
     role: "user",
     content: questionContent,
   };
-  const answer: ChatCompletionAssistantMessageParam = {
-    role: "assistant",
-    content: answerContent,
-  };
+
   const convoDir = convoState.getDir();
   const convoJsonPath = `${convoDir}/conversation.json`;
   const convoArr = convoState.getHistory();
 
-  convoArr.push(question, answer);
+  convoArr.push(question);
+  convoState.setHistory(convoArr);
+
+  fs.writeFile(convoJsonPath, JSON.stringify(convoArr), (err) => {
+    if (err) throw err;
+  });
+};
+
+export const addAnswerToConvo = (answerContent: string) => {
+  const answer: ChatCompletionAssistantMessageParam = {
+    role: "assistant",
+    content: answerContent,
+  };
+
+  const convoDir = convoState.getDir();
+  const convoJsonPath = `${convoDir}/conversation.json`;
+  const convoArr = convoState.getHistory();
+
+  convoArr.push(answer);
   convoState.setHistory(convoArr);
 
   fs.writeFile(convoJsonPath, JSON.stringify(convoArr), (err) => {
@@ -113,14 +125,26 @@ export const addToConvo = async (
 };
 
 /**
+ * Creates markdown file and returns the file location
+ */
+export const writeMarkdown = (filePath: string, content: string) => {
+  fs.writeFile(`${filePath}/last_answer.md`, content, (err) => {
+    if (err) throw err;
+  });
+  return `${filePath}/last_answer.md`;
+};
+
+/**
  * doesnt yet switch the date dir, but for the current date will switch
  * the current conversation.
  */
 export const switchConvo = async (convoNum: number) => {
   convoState.setNum(convoNum);
-  convoState.setDir(convoNum.toString());
+  const currentDateDir = convoState.getDateDir();
+  convoState.setDir(`${currentDateDir}/${convoNum.toString()}`);
 
   const currentConvo = convoState.getDir();
+  console.log(currentConvo);
   const convoJsonPath = `${currentConvo}/conversation.json`;
   const history = await readAndParseJson(convoJsonPath);
 
