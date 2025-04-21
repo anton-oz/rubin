@@ -11,6 +11,10 @@ greta is an open source tool for cli llm inference.
 - [pnpm](https://pnpm.io/installation)
 
 - [tsx](https://tsx.is/)
+    ```bash
+    pnpm install -g tsx
+    ```
+- [bat](https://github.com/sharkdp/bat?tab=readme-ov-file#installation)
 
 ### Quick Start
 

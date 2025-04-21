@@ -7,8 +7,8 @@
     "greta": "./build/index.js"
   },
   "scripts": {
-    "build": "tsc",
-    "build:watch": "tsc -w",
+    "build": "pnpm tsc",
+    "build:watch": "pnpm tsc -w",
     "build:start": "pnpm build && pnpm start",
     "start": "pnpm tsx build/index.js",
     "dev": "pnpm tsx src/index.ts",
@@ -18,12 +18,13 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.8.1",
+  "packageManager": "pnpm@10.9.0",
   "dependencies": {
     "openai": "^4.93.0",
     "tsx": "^4.19.3"
   },
   "devDependencies": {
-    "@types/node": "^22.14.0"
+    "@types/node": "^22.14.0",
+    "typescript": "^5.8.3"
   }
 }
