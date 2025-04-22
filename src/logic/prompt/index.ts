@@ -24,6 +24,7 @@ export const gretaPrompt = async (modelName: string) => {
       .then((input) => input.trim());
 
     if (isExitCommand(question)) {
+      console.clear();
       process.exit(0);
     }
     if (isCommand(question)) {

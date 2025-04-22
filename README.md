@@ -1,8 +1,11 @@
-# Greta
+<div align="center">
+    # Greta
 
-![size](https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square)
+    ![size](https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square)
 
-greta is an open source tool for cli llm inference.
+    cli llm inference for the local hosters
+</div>
+
 
 ## Installation
 
