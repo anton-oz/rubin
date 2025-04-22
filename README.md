@@ -1,6 +1,8 @@
-<div align="center">
-    # Greta
+<h1 align="center">
+    Greta
+</h1>
 
+<div align="center">
     ![size](https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square)
 
     cli llm inference for the local hosters
