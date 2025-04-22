@@ -1,13 +1,10 @@
-<h1 align="center">
-    Greta
-</h1>
+<h1 align="center">Greta</h1>
 
-<div align="center">
-<img src="https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square" />
-
-cli llm inference for the local hosters
+<div align="center" style="padding: 1em;">
+    <img src="https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square" />
 </div>
 
+<h4 align="center">cli llm inference for the local hosters</h4>
 
 ## Installation
 
