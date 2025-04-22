@@ -3,12 +3,7 @@
 </h1>
 
 <div align="center">
-<<<<<<< Updated upstream
-![size](https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square)
-=======
-<!-- ![size](https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square) -->
 <img src="https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square" />
->>>>>>> Stashed changes
 
 cli llm inference for the local hosters
 </div>
