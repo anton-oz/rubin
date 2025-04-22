@@ -3,9 +3,9 @@
 </h1>
 
 <div align="center">
-    ![size](https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square)
+![size](https://img.shields.io/github/languages/code-size/anton-oz/greta?style=flat-square)
 
-    cli llm inference for the local hosters
+cli llm inference for the local hosters
 </div>
 
 
