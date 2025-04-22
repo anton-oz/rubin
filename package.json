@@ -13,7 +13,8 @@
     "start": "pnpm tsx build/index.js",
     "dev": "pnpm tsx src/index.ts",
     "prod": "pnpm build && chmod +x build/index.js",
-    "clean:convos": "rm -rf convos"
+    "clean:convos": "rm -rf convos",
+    "preview:readme": "comrak --unsafe README.md -o preview.html"
   },
   "keywords": [],
   "author": "",
