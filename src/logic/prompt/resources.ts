@@ -1,5 +1,10 @@
 import * as readline from "node:readline/promises";
-import { switchConvo, createConvo } from "../filesystem";
+import {
+  switchConvo,
+  createConvo,
+  convoState,
+  isConvoEmpty,
+} from "../filesystem";
 import { spawn } from "child_process";
 
 /**
@@ -69,6 +74,14 @@ export const processCommand = async (command: Command) => {
       await switchConvo(convoNum);
       break;
     case "new":
+      const currentConvo = convoState.getDir();
+      const empty = await isConvoEmpty(`${currentConvo}/convo.json`);
+      if (empty) {
+        console.log(
+          "\nYour current convo is empty, not creating a new convo\n",
+        );
+        break;
+      }
       await createConvo();
       break;
     case "clear":

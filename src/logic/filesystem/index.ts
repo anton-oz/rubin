@@ -81,7 +81,7 @@ export const isConvoEmpty = async (filePath: string): Promise<boolean> => {
   }
 };
 
-export const getLastConvoPath = async () => {
+export const getLastConvo = async () => {
   const currentDateDir = convoState.getDateDir();
   const convos = await dirArray(currentDateDir);
 
@@ -90,7 +90,12 @@ export const getLastConvoPath = async () => {
   }
   const lastConvoPath = `${currentDateDir}/${convos.length}/convo.json`;
 
-  return path.normalize(lastConvoPath);
+  const lastConvo = {
+    path: lastConvoPath,
+    num: convos.length,
+  };
+
+  return lastConvo;
 };
 
 export const createConvo = async () => {
