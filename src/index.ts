@@ -5,6 +5,7 @@ import { promptLoop } from "@/logic/prompt";
 import { createConvo, getLastConvo, isConvoEmpty } from "@/logic/filesystem";
 
 const main = async () => {
+  console.clear();
   const modelName = await getModelName();
   const lastConvo = await getLastConvo();
   const isEmpty = lastConvo ? await isConvoEmpty(lastConvo.path) : undefined;
@@ -13,7 +14,7 @@ const main = async () => {
     await createConvo();
   } else {
     console.log(
-      `\nResuming last convo: ${lastConvo.num} because it was empty.`,
+      `Resuming last convo: ${lastConvo.num} because it was empty.`,
       `\nLocation: ${lastConvo.path}\n`,
     );
   }

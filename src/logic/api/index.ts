@@ -36,39 +36,53 @@ export const getModelName = async () => {
  * tools
  */
 
-const fetchURL = async (url: string) => {
-  try {
-    const response = await fetch(url);
-    const data = response.json();
-    return data;
-  } catch (error) {
-    console.error("Error making fetch: ", error);
-    return null;
+interface PointsResponse {
+  properties: {
+    forecast?: string;
+  };
+}
+
+interface ForecastPeriod {
+  name?: string;
+  temperature?: string;
+  temperatureUnit?: string;
+  windSpeed?: string;
+  windDirection?: string;
+  shortForecast?: string;
+}
+
+interface ForecastResponse {
+  properties: {
+    periods: ForecastPeriod[];
+  };
+}
+async function fetchURL<T>(url: string): Promise<T> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(response.statusText);
   }
-};
+  const data = await response.json();
+  return data as T;
+}
 
 const getWeather = async (latitude: number, longitude: number) => {
   const base_weather_api = "https://api.weather.gov";
   const points_endpoint = `${base_weather_api}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
   try {
-    const pointsData = await fetchURL(points_endpoint);
+    const pointsData = await fetchURL<PointsResponse>(points_endpoint);
     const forecastURL = pointsData.properties?.forecast;
     if (!forecastURL) {
       throw new Error("Error: could not get forecast url.");
     }
 
-    const forecastData = await fetchURL(forecastURL);
-    const current = forecastData.properties?.periods[0];
-    if (!current) {
-      throw new Error("Error: could not get current forecast data");
+    const forecastData = await fetchURL<ForecastResponse>(forecastURL);
+    const forecastInfo = [];
+    const periods = forecastData.properties.periods;
+    for (const period in periods) {
+      forecastInfo.push(periods[period]);
     }
 
-    const formatForecast = {
-      name: `${current.name}`,
-      temp: `${current.temperature} ${current.temperatureUnit}`,
-      description: `${current.detailedForecast}`,
-    };
-    return formatForecast;
+    return JSON.stringify(forecastInfo);
   } catch (error) {
     console.error("Error making weather request: ", error);
     return null;
@@ -106,11 +120,6 @@ interface ToolResponse {
   message: string;
 }
 
-interface ToolResponseError {
-  id: string;
-  message: string;
-}
-
 const handleToolCall = async (
   tool_calls: ChatCompletionMessageToolCall[],
 ): Promise<ToolResponse | null> => {
@@ -128,7 +137,9 @@ const handleToolCall = async (
             message: "Error: could not get forecast",
           };
         }
-        const message = `${forecast.name} it will be ${forecast.temp}, ${forecast.description}`;
+        const message = forecast;
+
+        // const message = `${forecast.name} it will be ${forecast.temp}, ${forecast.description}`;
 
         return {
           id,
