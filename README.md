@@ -1,7 +1,21 @@
-<h1 align="center">Rubin</h1>
-
-<div align="center" style="min-width: fit;">
-    <pre>
+<h1 align="center" style="font-size: 45px; margin-bottom: 0;">Rubin</h1>
+<div
+  align="center"
+  style=
+    "
+    padding: 0;
+    margin: 0;
+    min-width: fit;
+    height: 27%;
+    "
+>
+    <pre style="
+        padding: 0;
+        margin: 0;
+        transform: scale(0.5);
+        max-height: 10%;
+        top: 0;
+    ">
                   ⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⣄⡛⢿⣿⣿⣿⣶⣤⡑⣦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                           ⠀⠀⠈⠛⠛⠻⢿⣿⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
                          ⠀⢀⣠⠶⠊⣭⣽⣾⣿⣿⣿⣿⣿⣟⣴⣧⣤⣄⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
