@@ -1,16 +1,21 @@
 import OpenAI from "openai";
 import { baseURL } from "./resources";
 import { ChatCompletionMessageParam } from "openai/src/resources.js";
-import { ChatCompletionUserMessageParam } from "openai/resources.mjs";
+import {
+  ChatCompletionMessageToolCall,
+  ChatCompletionTool,
+  ChatCompletionToolChoiceOption,
+  ChatCompletionToolMessageParam,
+  ChatCompletionUserMessageParam,
+} from "openai/resources.mjs";
+import { warn } from "console";
+import { convoState } from "../filesystem";
 
 const client = new OpenAI({
   baseURL,
   apiKey: "nothing",
 });
 
-/**
- * checks the url given for baseURL and returns the first model at that url.
- */
 export const getModelName = async () => {
   try {
     const res = await fetch(`${baseURL}/models`);
@@ -24,6 +29,117 @@ export const getModelName = async () => {
     );
     process.exit(1);
   }
+};
+
+/**
+ * NOTE:
+ * tools
+ */
+
+const fetchURL = async (url: string) => {
+  try {
+    const response = await fetch(url);
+    const data = response.json();
+    return data;
+  } catch (error) {
+    console.error("Error making fetch: ", error);
+    return null;
+  }
+};
+
+const getWeather = async (latitude: number, longitude: number) => {
+  const base_weather_api = "https://api.weather.gov";
+  const points_endpoint = `${base_weather_api}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
+  try {
+    const pointsData = await fetchURL(points_endpoint);
+    const forecastURL = pointsData.properties?.forecast;
+    if (!forecastURL) {
+      throw new Error("Error: could not get forecast url.");
+    }
+
+    const forecastData = await fetchURL(forecastURL);
+    const current = forecastData.properties?.periods[0];
+    if (!current) {
+      throw new Error("Error: could not get current forecast data");
+    }
+
+    const formatForecast = {
+      name: `${current.name}`,
+      temp: `${current.temperature} ${current.temperatureUnit}`,
+      description: `${current.detailedForecast}`,
+    };
+    return formatForecast;
+  } catch (error) {
+    console.error("Error making weather request: ", error);
+    return null;
+  }
+};
+// NOTE: test prompt
+// get the longitude and latitude for san francisco california, and find the weather
+
+const tools: ChatCompletionTool[] = [
+  {
+    type: "function",
+    function: {
+      name: "get_weather",
+      description: "get the weather for the input location.",
+      parameters: {
+        type: "object",
+        properties: {
+          latitude: {
+            type: "number",
+            description: "the latitude number of the input location",
+          },
+          longitude: {
+            type: "number",
+            description: "the longitude number of the input location",
+          },
+        },
+        required: ["latitude", "longitude"],
+      },
+    },
+  },
+];
+
+interface ToolResponse {
+  id: string;
+  message: string;
+}
+
+interface ToolResponseError {
+  id: string;
+  message: string;
+}
+
+const handleToolCall = async (
+  tool_calls: ChatCompletionMessageToolCall[],
+): Promise<ToolResponse | null> => {
+  for (const call of tool_calls) {
+    const func = call.function;
+    const args = JSON.parse(func.arguments);
+    const id = call.id;
+
+    switch (func.name) {
+      case "get_weather":
+        const forecast = await getWeather(args.latitude, args.longitude);
+        if (!forecast) {
+          return {
+            id,
+            message: "Error: could not get forecast",
+          };
+        }
+        const message = `${forecast.name} it will be ${forecast.temp}, ${forecast.description}`;
+
+        return {
+          id,
+          message,
+        };
+      default:
+        return null;
+    }
+  }
+  console.error("Error: how did I get here?");
+  return null;
 };
 
 /**
@@ -45,10 +161,59 @@ export const getAnswer = async (
     const response = await client.chat.completions.create({
       model,
       messages: history ? history : [message],
+      tools,
+      tool_choice: "auto",
     });
 
-    const answer = response.choices[0].message.content;
-    return answer;
+    const finalText = [];
+
+    const choice = response.choices[0];
+
+    finalText.push(choice.message.content);
+    const toolCalls = choice.message?.tool_calls;
+    if (toolCalls !== undefined && toolCalls.length > 0) {
+      const toolName = toolCalls[0].function.name;
+      const toolArgs = toolCalls[0].function.arguments;
+
+      const toolResult = await handleToolCall(toolCalls);
+      finalText.push(`[ Called ${toolName} ]\n`);
+
+      if (toolResult) {
+        const toolMessage: ChatCompletionToolMessageParam = {
+          tool_call_id: toolResult.id,
+          role: "tool",
+          content: toolResult.message,
+        };
+        if (history) {
+          history.push(toolMessage);
+        } else {
+          const history = convoState.getHistory();
+          history.push(toolMessage);
+        }
+      }
+
+      const response = await client.chat.completions.create({
+        model,
+        messages: history ? history : convoState.getHistory(),
+      });
+      const text = response.choices[0].message.content;
+
+      finalText.push(text);
+    }
+
+    return finalText.join("\n");
+
+    // NOTE: streaming shit
+    // const stream = await client.chat.completions.create({
+    //   model,
+    //   messages: history ? history : [message],
+    //   stream: true,
+    //   tools,
+    //   tool_choice: "auto",
+    // });
+    // for await (const content of stream) {
+    //   console.log(content.choices[0].delta.content);
+    // }
   } catch (e) {
     console.error(e);
     process.exit(1);

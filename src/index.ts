@@ -7,11 +7,14 @@ import { createConvo, getLastConvo, isConvoEmpty } from "@/logic/filesystem";
 const main = async () => {
   const modelName = await getModelName();
   const lastConvo = await getLastConvo();
-  if (!lastConvo || !isConvoEmpty(lastConvo.path)) {
+  const isEmpty = lastConvo ? await isConvoEmpty(lastConvo.path) : undefined;
+  // avoid creating unneccesary convos
+  if (!lastConvo || !isEmpty) {
     await createConvo();
   } else {
     console.log(
-      `\nResuming last convo: ${lastConvo.num} because it was empty.\n`,
+      `\nResuming last convo: ${lastConvo.num} because it was empty.`,
+      `\nLocation: ${lastConvo.path}\n`,
     );
   }
   gretaPrompt(modelName);
