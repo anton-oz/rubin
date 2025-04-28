@@ -17,7 +17,7 @@ import {
  * main prompt function, contains all logic neccesary for prompting
  * user via cli
  */
-export const gretaPrompt = async (modelName: string) => {
+export const promptLoop = async (modelName: string) => {
   while (true) {
     const question = await rl
       .question("Enter Question: ")

@@ -1,7 +1,7 @@
 #!/usr/bin/env tsx
 
 import { getModelName } from "@/logic/api/index";
-import { gretaPrompt } from "@/logic/prompt";
+import { promptLoop } from "@/logic/prompt";
 import { createConvo, getLastConvo, isConvoEmpty } from "@/logic/filesystem";
 
 const main = async () => {
@@ -17,7 +17,7 @@ const main = async () => {
       `\nLocation: ${lastConvo.path}\n`,
     );
   }
-  gretaPrompt(modelName);
+  promptLoop(modelName);
 };
 
 main();

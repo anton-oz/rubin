@@ -1,5 +1,2 @@
 onlyBuiltDependencies:
   - esbuild
-
-overrides:
-  greta: 'link:'

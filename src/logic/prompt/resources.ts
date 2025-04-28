@@ -28,6 +28,7 @@ export const isExitCommand = (input: string): input is ExitCommand => {
   return exitCommands.has(input as ExitCommand);
 };
 
+// TODO: update help commands
 export const showHelp = () => {
   // prettier-ignore
   console.log(
@@ -35,7 +36,7 @@ export const showHelp = () => {
     "'h', 'help' -- display this help menu\n" +
     "'exit', 'q' -- quit program\n" +
     "commands: \n" +
-    "  file -- enter file path for greta to read\n" +
+    "  file -- enter file path to read\n" +
     "  new -- create a new conversation\n" +
     "  clear -- clear the screen\n"
    );
