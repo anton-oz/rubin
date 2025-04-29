@@ -4,11 +4,9 @@ import { ChatCompletionMessageParam } from "openai/src/resources.js";
 import {
   ChatCompletionMessageToolCall,
   ChatCompletionTool,
-  ChatCompletionToolChoiceOption,
   ChatCompletionToolMessageParam,
   ChatCompletionUserMessageParam,
 } from "openai/resources.mjs";
-import { warn } from "console";
 import { convoState } from "../filesystem";
 
 const client = new OpenAI({
@@ -43,12 +41,16 @@ interface PointsResponse {
 }
 
 interface ForecastPeriod {
+  number?: number;
   name?: string;
   temperature?: string;
   temperatureUnit?: string;
   windSpeed?: string;
   windDirection?: string;
   shortForecast?: string;
+  detailedForecast?: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 interface ForecastResponse {
@@ -65,7 +67,7 @@ async function fetchURL<T>(url: string): Promise<T> {
   return data as T;
 }
 
-const getWeather = async (latitude: number, longitude: number) => {
+const getForecast = async (latitude: number, longitude: number) => {
   const base_weather_api = "https://api.weather.gov";
   const points_endpoint = `${base_weather_api}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
   try {
@@ -78,11 +80,62 @@ const getWeather = async (latitude: number, longitude: number) => {
     const forecastData = await fetchURL<ForecastResponse>(forecastURL);
     const forecastInfo = [];
     const periods = forecastData.properties.periods;
-    for (const period in periods) {
-      forecastInfo.push(periods[period]);
+    for (const i in periods) {
+      const num = periods[i].number;
+      if (num && num > 5) break;
+      const {
+        name,
+        temperature,
+        temperatureUnit,
+        windSpeed,
+        windDirection,
+        shortForecast,
+        detailedForecast,
+        startTime,
+        endTime,
+      } = periods[i];
+      const relevantInfo: ForecastPeriod = {
+        name,
+        temperature,
+        temperatureUnit,
+        windSpeed,
+        windDirection,
+        shortForecast,
+        detailedForecast,
+        startTime,
+        endTime,
+      };
+      forecastInfo.push(relevantInfo);
+    }
+    return JSON.stringify(forecastInfo);
+  } catch (error) {
+    console.error("Error getting forecast.", error);
+    return null;
+  }
+};
+
+const getWeather = async (latitude: number, longitude: number) => {
+  const base_weather_api = "https://api.weather.gov";
+  const points_endpoint = `${base_weather_api}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
+  try {
+    const pointsData = await fetchURL<PointsResponse>(points_endpoint);
+    const forecastURL = pointsData.properties?.forecast;
+    if (!forecastURL) {
+      throw new Error("Error: could not get forecast url.");
     }
 
-    return JSON.stringify(forecastInfo);
+    const forecastData = await fetchURL<ForecastResponse>(forecastURL);
+
+    // current weather data only
+    const current = forecastData.properties?.periods[0];
+    if (!current) {
+      throw new Error("Error: could not get current forecast data");
+    }
+
+    const formatForecast = {
+      ...current,
+    };
+    return JSON.stringify(formatForecast);
   } catch (error) {
     console.error("Error making weather request: ", error);
     return null;
@@ -113,6 +166,27 @@ const tools: ChatCompletionTool[] = [
       },
     },
   },
+  {
+    type: "function",
+    function: {
+      name: "get_forecast",
+      description: "get the forecast for the input location",
+      parameters: {
+        type: "object",
+        properties: {
+          latitude: {
+            type: "number",
+            description: "the latitude number of the input location",
+          },
+          longitude: {
+            type: "number",
+            description: "the longitude number of the input location",
+          },
+          required: ["latitude", "longitude"],
+        },
+      },
+    },
+  },
 ];
 
 interface ToolResponse {
@@ -128,19 +202,32 @@ const handleToolCall = async (
     const args = JSON.parse(func.arguments);
     const id = call.id;
 
+    let message: ToolResponse["message"];
     switch (func.name) {
       case "get_weather":
-        const forecast = await getWeather(args.latitude, args.longitude);
+        const weather = await getWeather(args.latitude, args.longitude);
+        if (!weather) {
+          return {
+            id,
+            message: "Error: could not get weather",
+          };
+        }
+        message = weather;
+        return {
+          id,
+          message,
+        };
+      case "get_forecast":
+        const forecast = await getForecast(args.latitude, args.longitude);
         if (!forecast) {
           return {
             id,
             message: "Error: could not get forecast",
           };
         }
-        const message = forecast;
 
-        // const message = `${forecast.name} it will be ${forecast.temp}, ${forecast.description}`;
-
+        message = forecast;
+        console.log("forecast context: \n", forecast);
         return {
           id,
           message,
@@ -169,6 +256,7 @@ export const getAnswer = async (
   };
 
   try {
+    console.time("getAnswer");
     const response = await client.chat.completions.create({
       model,
       messages: history ? history : [message],
@@ -178,10 +266,10 @@ export const getAnswer = async (
 
     const finalText = [];
 
-    const choice = response.choices[0];
+    const choice = response.choices[0].message;
 
-    finalText.push(choice.message.content);
-    const toolCalls = choice.message?.tool_calls;
+    finalText.push(choice.content);
+    const toolCalls = choice?.tool_calls;
     if (toolCalls !== undefined && toolCalls.length > 0) {
       const toolName = toolCalls[0].function.name;
       const toolArgs = toolCalls[0].function.arguments;
@@ -203,15 +291,18 @@ export const getAnswer = async (
         }
       }
 
+      console.timeLog("getAnswer", "tool call context given");
       const response = await client.chat.completions.create({
         model,
         messages: history ? history : convoState.getHistory(),
       });
+      console.timeLog("getAnswer", "tool call context end");
       const text = response.choices[0].message.content;
 
       finalText.push(text);
     }
 
+    console.timeEnd("getAnswer");
     return finalText.join("\n");
 
     // NOTE: streaming shit
