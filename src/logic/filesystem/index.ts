@@ -128,7 +128,8 @@ export const addSystemPromptToConvo = (systemPrompt?: string) => {
       `The current date and time is ${new Date()}. ` +
       `You only have access to the tools provided to you, ` +
       `and will supply the parameters from your own memory unless otherwise prompted. ` +
-      `You answer questions in an accurate and concise manner, being accurate as a first priority.`,
+      `You answer questions in an accurate and concise manner, being accurate as a first priority. ` +
+      `You will stay professional and not be too friendly or verbose in your answers.`,
   };
   if (systemPrompt) {
     prompt.content += systemPrompt;
