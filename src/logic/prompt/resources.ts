@@ -33,12 +33,12 @@ export const showHelp = () => {
   // prettier-ignore
   console.log(
     "\n" +
-    "'h', 'help' -- display this help menu\n" +
-    "'exit', 'q' -- quit program\n" +
+    "'h', 'help'    display this help menu\n" +
+    "'exit', 'q'    quit program\n" +
     "commands: \n" +
-    "  file -- enter file path to read\n" +
-    "  new -- create a new conversation\n" +
-    "  clear -- clear the screen\n"
+    "  file\n    enter file path to read\n" +
+    "  new\n    create a new conversation\n" +
+    "  clear\n    clear the screen\n"
    );
 };
 /**

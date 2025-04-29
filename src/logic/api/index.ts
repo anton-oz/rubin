@@ -3,11 +3,11 @@ import { baseURL } from "./resources";
 import { ChatCompletionMessageParam } from "openai/src/resources.js";
 import {
   ChatCompletionMessageToolCall,
-  ChatCompletionTool,
   ChatCompletionToolMessageParam,
   ChatCompletionUserMessageParam,
 } from "openai/resources.mjs";
 import { convoState } from "../filesystem";
+import { getWeather, getForecast, tools } from "../tools";
 
 const client = new OpenAI({
   baseURL,
@@ -28,166 +28,6 @@ export const getModelName = async () => {
     process.exit(1);
   }
 };
-
-/**
- * NOTE:
- * tools
- */
-
-interface PointsResponse {
-  properties: {
-    forecast?: string;
-  };
-}
-
-interface ForecastPeriod {
-  number?: number;
-  name?: string;
-  temperature?: string;
-  temperatureUnit?: string;
-  windSpeed?: string;
-  windDirection?: string;
-  shortForecast?: string;
-  detailedForecast?: string;
-  startTime?: string;
-  endTime?: string;
-}
-
-interface ForecastResponse {
-  properties: {
-    periods: ForecastPeriod[];
-  };
-}
-async function fetchURL<T>(url: string): Promise<T> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
-  const data = await response.json();
-  return data as T;
-}
-
-const getForecast = async (latitude: number, longitude: number) => {
-  const base_weather_api = "https://api.weather.gov";
-  const points_endpoint = `${base_weather_api}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
-  try {
-    const pointsData = await fetchURL<PointsResponse>(points_endpoint);
-    const forecastURL = pointsData.properties?.forecast;
-    if (!forecastURL) {
-      throw new Error("Error: could not get forecast url.");
-    }
-
-    const forecastData = await fetchURL<ForecastResponse>(forecastURL);
-    const forecastInfo = [];
-    const periods = forecastData.properties.periods;
-    for (const i in periods) {
-      const num = periods[i].number;
-      if (num && num > 5) break;
-      const {
-        name,
-        temperature,
-        temperatureUnit,
-        windSpeed,
-        windDirection,
-        shortForecast,
-        detailedForecast,
-        startTime,
-        endTime,
-      } = periods[i];
-      const relevantInfo: ForecastPeriod = {
-        name,
-        temperature,
-        temperatureUnit,
-        windSpeed,
-        windDirection,
-        shortForecast,
-        detailedForecast,
-        startTime,
-        endTime,
-      };
-      forecastInfo.push(relevantInfo);
-    }
-    return JSON.stringify(forecastInfo);
-  } catch (error) {
-    console.error("Error getting forecast.", error);
-    return null;
-  }
-};
-
-const getWeather = async (latitude: number, longitude: number) => {
-  const base_weather_api = "https://api.weather.gov";
-  const points_endpoint = `${base_weather_api}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
-  try {
-    const pointsData = await fetchURL<PointsResponse>(points_endpoint);
-    const forecastURL = pointsData.properties?.forecast;
-    if (!forecastURL) {
-      throw new Error("Error: could not get forecast url.");
-    }
-
-    const forecastData = await fetchURL<ForecastResponse>(forecastURL);
-
-    // current weather data only
-    const current = forecastData.properties?.periods[0];
-    if (!current) {
-      throw new Error("Error: could not get current forecast data");
-    }
-
-    const formatForecast = {
-      ...current,
-    };
-    return JSON.stringify(formatForecast);
-  } catch (error) {
-    console.error("Error making weather request: ", error);
-    return null;
-  }
-};
-// NOTE: test prompt
-// get the longitude and latitude for san francisco california, and find the weather
-
-const tools: ChatCompletionTool[] = [
-  {
-    type: "function",
-    function: {
-      name: "get_weather",
-      description: "get the weather for the input location.",
-      parameters: {
-        type: "object",
-        properties: {
-          latitude: {
-            type: "number",
-            description: "the latitude number of the input location",
-          },
-          longitude: {
-            type: "number",
-            description: "the longitude number of the input location",
-          },
-        },
-        required: ["latitude", "longitude"],
-      },
-    },
-  },
-  {
-    type: "function",
-    function: {
-      name: "get_forecast",
-      description: "get the forecast for the input location",
-      parameters: {
-        type: "object",
-        properties: {
-          latitude: {
-            type: "number",
-            description: "the latitude number of the input location",
-          },
-          longitude: {
-            type: "number",
-            description: "the longitude number of the input location",
-          },
-          required: ["latitude", "longitude"],
-        },
-      },
-    },
-  },
-];
 
 interface ToolResponse {
   id: string;
@@ -227,7 +67,6 @@ const handleToolCall = async (
         }
 
         message = forecast;
-        console.log("forecast context: \n", forecast);
         return {
           id,
           message,
@@ -272,7 +111,7 @@ export const getAnswer = async (
     const toolCalls = choice?.tool_calls;
     if (toolCalls !== undefined && toolCalls.length > 0) {
       const toolName = toolCalls[0].function.name;
-      const toolArgs = toolCalls[0].function.arguments;
+      // const toolArgs = toolCalls[0].function.arguments;
 
       const toolResult = await handleToolCall(toolCalls);
       finalText.push(`[ Called ${toolName} ]\n`);
@@ -291,12 +130,10 @@ export const getAnswer = async (
         }
       }
 
-      console.timeLog("getAnswer", "tool call context given");
       const response = await client.chat.completions.create({
         model,
         messages: history ? history : convoState.getHistory(),
       });
-      console.timeLog("getAnswer", "tool call context end");
       const text = response.choices[0].message.content;
 
       finalText.push(text);

@@ -11,6 +11,7 @@ import {
 import {
   ChatCompletionMessageParam,
   ChatCompletionUserMessageParam,
+  ChatCompletionSystemMessageParam,
 } from "openai/resources.mjs";
 import { ChatCompletionAssistantMessageParam } from "openai/src/resources.js";
 
@@ -117,6 +118,32 @@ export const createConvo = async () => {
   console.log(`Current convo: ${newConvoNum}`);
   console.log(`Location: ${newConvoDir}`);
   console.log("---");
+};
+
+export const addSystemPromptToConvo = (systemPrompt?: string) => {
+  const prompt: ChatCompletionSystemMessageParam = {
+    role: "system",
+    content:
+      `Your name is Rubin, a helpful, calm, zen, vibe assistant. ` +
+      `The current date and time is ${new Date()}. ` +
+      `You only have access to the tools provided to you, ` +
+      `and will supply the parameters from your own memory unless otherwise prompted. ` +
+      `You answer questions in an accurate and concise manner, being accurate as a first priority.`,
+  };
+  if (systemPrompt) {
+    prompt.content += systemPrompt;
+  }
+
+  const convoDir = convoState.getDir();
+  const convoJsonPath = `${convoDir}/convo.json`;
+  const convoArr = convoState.getHistory();
+
+  convoArr.push(prompt);
+  convoState.setHistory(convoArr);
+
+  fs.writeFile(convoJsonPath, JSON.stringify(convoArr), (err) => {
+    if (err) throw err;
+  });
 };
 
 export const addQuestionToConvo = (questionContent: string) => {
