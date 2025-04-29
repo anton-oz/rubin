@@ -1,37 +1,6 @@
 import { ChatCompletionTool } from "openai/resources.mjs";
-
-export interface PointsResponse {
-  properties: {
-    forecast?: string;
-  };
-}
-
-export interface ForecastPeriod {
-  number?: number;
-  name?: string;
-  temperature?: string;
-  temperatureUnit?: string;
-  windSpeed?: string;
-  windDirection?: string;
-  shortForecast?: string;
-  detailedForecast?: string;
-  startTime?: string;
-  endTime?: string;
-}
-
-export interface ForecastResponse {
-  properties: {
-    periods: ForecastPeriod[];
-  };
-}
-export async function fetchURL<T>(url: string): Promise<T> {
-  const response = await fetch(url);
-  if (!response.ok) {
-    throw new Error(response.statusText);
-  }
-  const data = await response.json();
-  return data as T;
-}
+import { fetchURL, formatPeriod } from "./resources";
+import { PointsResponse, ForecastResponse } from "./types";
 
 export const getForecast = async (latitude: number, longitude: number) => {
   const base_weather_api = "https://api.weather.gov";
@@ -47,31 +16,10 @@ export const getForecast = async (latitude: number, longitude: number) => {
     const forecastInfo = [];
     const periods = forecastData.properties.periods;
     for (const i in periods) {
-      const num = periods[i].number;
+      const period = periods[i];
+      const num = period.number;
       if (num && num > 5) break;
-      const {
-        name,
-        temperature,
-        temperatureUnit,
-        windSpeed,
-        windDirection,
-        shortForecast,
-        detailedForecast,
-        startTime,
-        endTime,
-      } = periods[i];
-      const relevantInfo: ForecastPeriod = {
-        name,
-        temperature,
-        temperatureUnit,
-        windSpeed,
-        windDirection,
-        shortForecast,
-        detailedForecast,
-        startTime,
-        endTime,
-      };
-      forecastInfo.push(relevantInfo);
+      forecastInfo.push(formatPeriod(period));
     }
     return JSON.stringify(forecastInfo);
   } catch (error) {
@@ -99,7 +47,7 @@ export const getWeather = async (latitude: number, longitude: number) => {
     }
 
     const formatForecast = {
-      ...current,
+      ...formatForecastPeriod(current),
     };
     return JSON.stringify(formatForecast);
   } catch (error) {

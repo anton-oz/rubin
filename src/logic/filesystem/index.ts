@@ -8,12 +8,7 @@ import {
   dirArray,
   readAndParseJson,
 } from "./resources";
-import {
-  ChatCompletionMessageParam,
-  ChatCompletionUserMessageParam,
-  ChatCompletionSystemMessageParam,
-} from "openai/resources.mjs";
-import { ChatCompletionAssistantMessageParam } from "openai/src/resources.js";
+import OpenAI from "openai";
 
 if (!fileExists(convosDir)) {
   await createDir(convosDir);
@@ -27,7 +22,7 @@ class ConvoState {
   private dateDir: string;
   private dir: string;
   private num: number;
-  private history: ChatCompletionMessageParam[];
+  private history: OpenAI.ChatCompletionMessageParam[];
 
   constructor(num: number) {
     this.num = num;
@@ -66,7 +61,7 @@ class ConvoState {
   getHistory() {
     return this.history;
   }
-  setHistory(history: ChatCompletionMessageParam[]) {
+  setHistory(history: OpenAI.ChatCompletionMessageParam[]) {
     this.history = history;
   }
 }
@@ -121,7 +116,7 @@ export const createConvo = async () => {
 };
 
 export const addSystemPromptToConvo = (systemPrompt?: string) => {
-  const prompt: ChatCompletionSystemMessageParam = {
+  const prompt: OpenAI.ChatCompletionSystemMessageParam = {
     role: "system",
     content:
       `Your name is Rubin, a helpful, calm, zen, vibe assistant. ` +
@@ -148,7 +143,7 @@ export const addSystemPromptToConvo = (systemPrompt?: string) => {
 };
 
 export const addQuestionToConvo = (questionContent: string) => {
-  const question: ChatCompletionUserMessageParam = {
+  const question: OpenAI.ChatCompletionUserMessageParam = {
     role: "user",
     content: questionContent,
   };
@@ -166,7 +161,7 @@ export const addQuestionToConvo = (questionContent: string) => {
 };
 
 export const addAnswerToConvo = (answerContent: string) => {
-  const answer: ChatCompletionAssistantMessageParam = {
+  const answer: OpenAI.ChatCompletionAssistantMessageParam = {
     role: "assistant",
     content: answerContent,
   };

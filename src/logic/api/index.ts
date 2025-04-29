@@ -1,13 +1,7 @@
 import OpenAI from "openai";
-import { baseURL } from "./resources";
-import { ChatCompletionMessageParam } from "openai/src/resources.js";
-import {
-  ChatCompletionMessageToolCall,
-  ChatCompletionToolMessageParam,
-  ChatCompletionUserMessageParam,
-} from "openai/resources.mjs";
 import { convoState } from "../filesystem";
 import { getWeather, getForecast, tools } from "../tools";
+import { baseURL } from "./resources";
 
 const client = new OpenAI({
   baseURL,
@@ -35,7 +29,7 @@ interface ToolResponse {
 }
 
 const handleToolCall = async (
-  tool_calls: ChatCompletionMessageToolCall[],
+  tool_calls: OpenAI.ChatCompletionMessageToolCall[],
 ): Promise<ToolResponse | null> => {
   for (const call of tool_calls) {
     const func = call.function;
@@ -87,9 +81,9 @@ const handleToolCall = async (
 export const getAnswer = async (
   model: string,
   question: string,
-  history?: ChatCompletionMessageParam[],
+  history?: OpenAI.ChatCompletionMessageParam[],
 ) => {
-  const message: ChatCompletionUserMessageParam = {
+  const message: OpenAI.ChatCompletionUserMessageParam = {
     role: "user",
     content: question,
   };
@@ -117,7 +111,7 @@ export const getAnswer = async (
       finalText.push(`[ Called ${toolName} ]\n`);
 
       if (toolResult) {
-        const toolMessage: ChatCompletionToolMessageParam = {
+        const toolMessage: OpenAI.ChatCompletionToolMessageParam = {
           tool_call_id: toolResult.id,
           role: "tool",
           content: toolResult.message,

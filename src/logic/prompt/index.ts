@@ -2,7 +2,6 @@ import { getAnswer } from "@/logic/api";
 import {
   addAnswerToConvo,
   addQuestionToConvo,
-  addSystemPromptToConvo,
   convoState,
   writeMarkdown,
 } from "@/logic/filesystem";
