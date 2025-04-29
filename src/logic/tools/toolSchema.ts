@@ -5,7 +5,8 @@ export const tools: ChatCompletionTool[] = [
     type: "function",
     function: {
       name: "get_weather",
-      description: "get the weather for the input location.",
+      description:
+        "get the current weather for a location in the united states utilzing latitude and longitude.",
       parameters: {
         type: "object",
         properties: {
@@ -26,7 +27,8 @@ export const tools: ChatCompletionTool[] = [
     type: "function",
     function: {
       name: "get_forecast",
-      description: "get the forecast for the input location",
+      description:
+        "gets the forecast for the next few days for a location in the united states utilizing latitude and longitude",
       parameters: {
         type: "object",
         properties: {

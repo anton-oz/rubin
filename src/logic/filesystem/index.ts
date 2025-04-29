@@ -8,6 +8,7 @@ import {
   dirArray,
   readAndParseJson,
 } from "./resources";
+import { ConvoState } from "./convoState";
 import OpenAI from "openai";
 
 if (!fileExists(convosDir)) {
@@ -16,54 +17,6 @@ if (!fileExists(convosDir)) {
 
 if (!fileExists(currentDateDir)) {
   await createDir(currentDateDir);
-}
-
-class ConvoState {
-  private dateDir: string;
-  private dir: string;
-  private num: number;
-  private history: OpenAI.ChatCompletionMessageParam[];
-
-  constructor(num: number) {
-    this.num = num;
-    this.dateDir = currentDateDir;
-    this.dir = `${currentDateDir}/${this.num}`;
-    this.history = [];
-  }
-
-  static async init() {
-    const convoArr = await dirArray(currentDateDir);
-    const convoNum = convoArr.length;
-    return new ConvoState(convoNum);
-  }
-
-  setDateDir(date: string) {
-    this.dateDir = path.normalize(`${convosDir}/${date}`);
-  }
-  getDateDir() {
-    return this.dateDir;
-  }
-
-  setDir(dir: string) {
-    this.dir = path.resolve(dir);
-  }
-  getDir() {
-    return this.dir;
-  }
-
-  setNum(num: number) {
-    this.num = num;
-  }
-  getNum() {
-    return this.num;
-  }
-
-  getHistory() {
-    return this.history;
-  }
-  setHistory(history: OpenAI.ChatCompletionMessageParam[]) {
-    this.history = history;
-  }
 }
 
 export const convoState = await ConvoState.init();
@@ -121,10 +74,8 @@ export const addSystemPromptToConvo = (systemPrompt?: string) => {
     content:
       `Your name is Rubin, a helpful, calm, zen, vibe assistant. ` +
       `The current date and time is ${new Date()}. ` +
-      `You only have access to the tools provided to you, ` +
-      `and will supply the parameters from your own memory unless otherwise prompted. ` +
-      `You answer questions in an accurate and concise manner, being accurate as a first priority. ` +
-      `You will stay professional and not be too friendly or verbose in your answers.`,
+      `You answer questions concisely, simply, and elegantly. ` +
+      `Use only the tools that have been supplied to you.`,
   };
   if (systemPrompt) {
     prompt.content += systemPrompt;
@@ -194,7 +145,7 @@ export const switchConvo = async (convoNum: number) => {
 
   const convos = await dirArray(currentDateDir);
   if (convoNum > convos.length) {
-    console.log("\nThat conversation does not exist.\n");
+    console.error("\nError: That conversation does not exist.\n");
     return;
   }
 

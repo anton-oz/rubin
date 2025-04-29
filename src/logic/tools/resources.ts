@@ -9,7 +9,7 @@ export async function fetchURL<T>(url: string): Promise<T> {
   return data as T;
 }
 
-export async function formatPeriod(period: ForecastPeriod) {
+export function formatPeriod(period: ForecastPeriod) {
   const {
     name,
     temperature,

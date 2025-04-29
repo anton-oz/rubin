@@ -1,19 +1,15 @@
+import { spawn } from "child_process";
 import * as readline from "node:readline/promises";
 import {
   switchConvo,
   createConvo,
-  convoState,
   isConvoEmpty,
-} from "../filesystem";
-import { spawn } from "child_process";
+  convoState,
+} from "@/logic/filesystem";
 
 /**
  * function for prompting user
  */
-export const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
 
 /**
  * commands that lead to exit.
@@ -63,7 +59,10 @@ export const isCommand = (input: string): input is Command => {
 /**
  * if command matches a case do the thing and continue the prompt loop
  */
-export const processCommand = async (command: Command) => {
+export const processCommand = async (
+  command: Command,
+  rl: readline.Interface,
+) => {
   switch (command) {
     case "h":
     case "help":
@@ -79,7 +78,7 @@ export const processCommand = async (command: Command) => {
       const empty = await isConvoEmpty(`${currentConvo}/convo.json`);
       if (empty) {
         console.log(
-          "\nYour current convo is empty, not creating a new convo\n",
+          "\nError: Your current convo is empty, not creating a new convo\n",
         );
         break;
       }

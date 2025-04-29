@@ -1,6 +1,7 @@
 import OpenAI from "openai";
 import { convoState } from "../filesystem";
-import { getWeather, getForecast, tools } from "../tools";
+import { getWeather, getForecast } from "../tools";
+import { tools } from "../tools/toolSchema";
 import { baseURL } from "./resources";
 
 const client = new OpenAI({
@@ -66,6 +67,7 @@ const handleToolCall = async (
           message,
         };
       default:
+        console.log("Error: that cannot be good");
         return null;
     }
   }
@@ -105,10 +107,11 @@ export const getAnswer = async (
     const toolCalls = choice?.tool_calls;
     if (toolCalls !== undefined && toolCalls.length > 0) {
       const toolName = toolCalls[0].function.name;
-      // const toolArgs = toolCalls[0].function.arguments;
 
+      console.log(`[ Called ${toolName} ]\n`);
+      console.time(`${toolName}`);
       const toolResult = await handleToolCall(toolCalls);
-      finalText.push(`[ Called ${toolName} ]\n`);
+      console.timeEnd(`${toolName}`);
 
       if (toolResult) {
         const toolMessage: OpenAI.ChatCompletionToolMessageParam = {

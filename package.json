@@ -8,13 +8,13 @@
   },
   "scripts": {
     "build": "pnpm tsc",
+    "build:readme": "comrak --unsafe README.md -o preview.html",
     "build:watch": "pnpm tsc -w",
     "build:start": "pnpm build && pnpm start",
     "start": "pnpm tsx build/index.js",
     "dev": "pnpm tsx src/index.ts",
     "prod": "pnpm build && chmod +x build/index.js",
-    "clean:convos": "rm -rf convos",
-    "preview:readme": "comrak --unsafe README.md -o preview.html"
+    "clean:convos": "rm -rf convos"
   },
   "keywords": [],
   "author": "",
