@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { convoState } from "../filesystem";
 import { getWeather, getForecast } from "../tools";
 import { tools } from "../tools/toolSchema";
-import { baseURL } from "./resources";
+import { baseURL, getTokensUsed } from "./resources";
 
 const client = new OpenAI({
   baseURL,
@@ -90,6 +90,10 @@ export const getAnswer = async (
     content: question,
   };
 
+  if (history) {
+    getTokensUsed(model, history);
+  }
+
   try {
     console.time("getAnswer");
     const response = await client.chat.completions.create({
@@ -108,9 +112,10 @@ export const getAnswer = async (
     if (toolCalls !== undefined && toolCalls.length > 0) {
       const toolName = toolCalls[0].function.name;
 
-      console.log(`[ Called ${toolName} ]\n`);
+      // console.log(`[ Called ${toolName} ]`);
       console.time(`${toolName}`);
       const toolResult = await handleToolCall(toolCalls);
+      finalText.push(`[ Called ${toolName}]`);
       console.timeEnd(`${toolName}`);
 
       if (toolResult) {

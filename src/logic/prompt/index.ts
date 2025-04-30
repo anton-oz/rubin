@@ -35,12 +35,7 @@ export const processQuery = async (
   addQuestionToConvo(query);
   const history = convoState.getHistory();
 
-  let answer;
-  if (history.length > 1) {
-    answer = await getAnswer(modelName, query, history);
-  } else {
-    answer = await getAnswer(modelName, query);
-  }
+  const answer = await getAnswer(modelName, query, history);
 
   if (!answer) {
     console.error("ERROR: Answer does not exist\n");
@@ -52,7 +47,6 @@ export const processQuery = async (
   const currentDirectory = convoState.getDir();
   const markdownFile = writeMarkdown(currentDirectory, answer);
 
-  console.log("\n");
   await asyncBat(markdownFile);
   console.log("\n");
 
