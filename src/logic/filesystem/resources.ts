@@ -29,7 +29,7 @@ export const currentDateDir = path.normalize(`${convosDir}/${currentDate}`);
 /**
  * ASYNC! returns array of directories in dirPath
  */
-export const dirArray = async (dirPath: string): Promise<string[]> => {
+export async function dirArray(dirPath: string): Promise<string[]> {
   try {
     const files = await fsp.readdir(dirPath);
     return files.map((file) => file.toString());
@@ -37,19 +37,19 @@ export const dirArray = async (dirPath: string): Promise<string[]> => {
     console.error(e);
     process.exit(0);
   }
-};
+}
 
 /**
  * check if directory exists
  */
-export const fileExists = (dirPath: string) => {
+export function fileExists(dirPath: string) {
   return fs.existsSync(dirPath);
-};
+}
 
 /**
  * ASYNC! create directory at dirPath
  */
-export const createDir = async (dirPath: string) => {
+export async function createDir(dirPath: string) {
   try {
     await fsp.mkdir(dirPath, { recursive: true });
     return;
@@ -57,12 +57,12 @@ export const createDir = async (dirPath: string) => {
     console.error(e);
     process.exit(0);
   }
-};
+}
 
 /**
  * ASYNC! Read and return parsed json file
  */
-export const readAndParseJson = async (filePath: string) => {
+export async function readAndParseJson(filePath: string) {
   try {
     const content = await fsp.readFile(filePath, { encoding: "utf-8" });
     return JSON.parse(content);
@@ -70,4 +70,4 @@ export const readAndParseJson = async (filePath: string) => {
     console.error(e);
     process.exit(0);
   }
-};
+}

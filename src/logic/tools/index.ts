@@ -1,7 +1,7 @@
 import { fetchURL, formatPeriod } from "./resources";
 import { PointsResponse, ForecastResponse } from "./types";
 
-export const getForecast = async (latitude: number, longitude: number) => {
+export async function getForecast(latitude: number, longitude: number) {
   const base_weather_api = "https://api.weather.gov";
   const points_endpoint = `${base_weather_api}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
   try {
@@ -25,9 +25,9 @@ export const getForecast = async (latitude: number, longitude: number) => {
     console.error("Error getting forecast.", error);
     return null;
   }
-};
+}
 
-export const getWeather = async (latitude: number, longitude: number) => {
+export async function getWeather(latitude: number, longitude: number) {
   const base_weather_api = "https://api.weather.gov";
   const points_endpoint = `${base_weather_api}/points/${latitude.toFixed(4)},${longitude.toFixed(4)}`;
   try {
@@ -53,4 +53,4 @@ export const getWeather = async (latitude: number, longitude: number) => {
     console.error("Error making weather request: ", error);
     return null;
   }
-};
+}

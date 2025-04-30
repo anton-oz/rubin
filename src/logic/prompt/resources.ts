@@ -20,12 +20,12 @@ export const exitCommands = new Set<ExitCommand>(["q", "quit", "exit"]);
 /**
  * check if command leads to exit
  */
-export const isExitCommand = (input: string): input is ExitCommand => {
+export function isExitCommand(input: string): input is ExitCommand {
   return exitCommands.has(input as ExitCommand);
-};
+}
 
 // TODO: update help commands
-export const showHelp = () => {
+export function showHelp() {
   // prettier-ignore
   console.log(
     "\n" +
@@ -36,7 +36,7 @@ export const showHelp = () => {
     "  new\n    create a new conversation\n" +
     "  clear\n    clear the screen\n"
    );
-};
+}
 /**
  * available commands
  */
@@ -52,17 +52,14 @@ export const commands = new Set<Command>([
 /**
  * check if command is available
  */
-export const isCommand = (input: string): input is Command => {
+export function isCommand(input: string): input is Command {
   return commands.has(input as Command);
-};
+}
 
 /**
  * if command matches a case do the thing and continue the prompt loop
  */
-export const processCommand = async (
-  command: Command,
-  rl: readline.Interface,
-) => {
+export async function processCommand(command: Command, rl: readline.Interface) {
   switch (command) {
     case "h":
     case "help":
@@ -90,14 +87,14 @@ export const processCommand = async (
     default:
       break;
   }
-};
+}
 
 /**
  * waits for user to stop paging before continuing prompt loop
  *
  * @param file - file to display/page with bat
  */
-export const asyncBat = (file: string): Promise<void> => {
+export async function asyncBat(file: string): Promise<void> {
   return new Promise((resolve, reject) => {
     const bat = spawn("bat", ["-p", "--file-name markdown", file], {
       // dont record any keypresses when paging with bat
@@ -113,4 +110,4 @@ export const asyncBat = (file: string): Promise<void> => {
       }
     });
   });
-};
+}

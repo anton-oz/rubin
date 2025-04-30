@@ -9,7 +9,7 @@ const client = new OpenAI({
   apiKey: "nothing",
 });
 
-export const getModelName = async () => {
+export async function getModelName() {
   try {
     const res = await fetch(`${baseURL}/models`);
     const { data } = await res.json();
@@ -22,16 +22,16 @@ export const getModelName = async () => {
     );
     process.exit(1);
   }
-};
+}
 
 interface ToolResponse {
   id: string;
   message: string;
 }
 
-const handleToolCall = async (
+async function handleToolCall(
   tool_calls: OpenAI.ChatCompletionMessageToolCall[],
-): Promise<ToolResponse | null> => {
+): Promise<ToolResponse | null> {
   for (const call of tool_calls) {
     const func = call.function;
     const args = JSON.parse(func.arguments);
@@ -73,26 +73,22 @@ const handleToolCall = async (
   }
   console.error("Error: how did I get here?");
   return null;
-};
+}
 
 /**
  * Gets the answer and adds to history.
  *
  * TODO: create seperate function for adding to history for cleaner code.
  */
-export const getAnswer = async (
+export async function getAnswer(
   model: string,
   question: string,
   history?: OpenAI.ChatCompletionMessageParam[],
-) => {
+) {
   const message: OpenAI.ChatCompletionUserMessageParam = {
     role: "user",
     content: question,
   };
-
-  if (history) {
-    getTokensUsed(model, history);
-  }
 
   try {
     console.time("getAnswer");
@@ -160,4 +156,4 @@ export const getAnswer = async (
     console.error(e);
     process.exit(1);
   }
-};
+}

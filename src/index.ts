@@ -9,7 +9,7 @@ import {
   isConvoEmpty,
 } from "@/logic/filesystem";
 
-const main = async () => {
+async function main() {
   console.clear();
   const modelName = await getModelName();
   const lastConvo = await getLastConvo();
@@ -25,6 +25,6 @@ const main = async () => {
     );
   }
   promptLoop(modelName);
-};
+}
 
 main();

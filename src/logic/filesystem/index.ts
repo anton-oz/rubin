@@ -21,16 +21,16 @@ if (!fileExists(currentDateDir)) {
 
 export const convoState = await ConvoState.init();
 
-export const isConvoEmpty = async (filePath: string): Promise<boolean> => {
+export async function isConvoEmpty(filePath: string): Promise<boolean> {
   const convo = await readAndParseJson(filePath);
   if (convo.length === 0) {
     return true;
   } else {
     return false;
   }
-};
+}
 
-export const getLastConvo = async () => {
+export async function getLastConvo() {
   const currentDateDir = convoState.getDateDir();
   const convos = await dirArray(currentDateDir);
 
@@ -45,9 +45,9 @@ export const getLastConvo = async () => {
   };
 
   return lastConvo;
-};
+}
 
-export const createConvo = async () => {
+export async function createConvo() {
   const currentDateDir = convoState.getDateDir();
   const convos = await dirArray(currentDateDir);
 
@@ -66,9 +66,9 @@ export const createConvo = async () => {
   console.log(`Current convo: ${newConvoNum}`);
   console.log(`Location: ${newConvoDir}`);
   console.log("---");
-};
+}
 
-export const addSystemPromptToConvo = (systemPrompt?: string) => {
+export async function addSystemPromptToConvo(systemPrompt?: string) {
   const prompt: OpenAI.ChatCompletionSystemMessageParam = {
     role: "system",
     content:
@@ -91,9 +91,9 @@ export const addSystemPromptToConvo = (systemPrompt?: string) => {
   fs.writeFile(convoJsonPath, JSON.stringify(convoArr), (err) => {
     if (err) throw err;
   });
-};
+}
 
-export const addQuestionToConvo = (questionContent: string) => {
+export async function addQuestionToConvo(questionContent: string) {
   const question: OpenAI.ChatCompletionUserMessageParam = {
     role: "user",
     content: questionContent,
@@ -109,9 +109,9 @@ export const addQuestionToConvo = (questionContent: string) => {
   fs.writeFile(convoJsonPath, JSON.stringify(convoArr), (err) => {
     if (err) throw err;
   });
-};
+}
 
-export const addAnswerToConvo = (answerContent: string) => {
+export async function addAnswerToConvo(answerContent: string) {
   const answer: OpenAI.ChatCompletionAssistantMessageParam = {
     role: "assistant",
     content: answerContent,
@@ -127,20 +127,20 @@ export const addAnswerToConvo = (answerContent: string) => {
   fs.writeFile(convoJsonPath, JSON.stringify(convoArr), (err) => {
     if (err) throw err;
   });
-};
+}
 
-export const writeMarkdown = (filePath: string, content: string) => {
+export function writeMarkdown(filePath: string, content: string) {
   fs.writeFile(`${filePath}/last_answer.md`, content, (err) => {
     if (err) throw err;
   });
   return `${filePath}/last_answer.md`;
-};
+}
 
 /**
  * doesnt yet switch the date dir, but for the current date will switch
  * the current conversation.
  */
-export const switchConvo = async (convoNum: number) => {
+export async function switchConvo(convoNum: number) {
   const currentDateDir = convoState.getDateDir();
 
   const convos = await dirArray(currentDateDir);
@@ -158,4 +158,4 @@ export const switchConvo = async (convoNum: number) => {
 
   convoState.setHistory(history);
   console.log(`current convo: ${currentConvo}\n` + "---");
-};
+}
