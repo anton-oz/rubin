@@ -112,10 +112,10 @@ export const getAnswer = async (
     if (toolCalls !== undefined && toolCalls.length > 0) {
       const toolName = toolCalls[0].function.name;
 
-      // console.log(`[ Called ${toolName} ]`);
       console.time(`${toolName}`);
       const toolResult = await handleToolCall(toolCalls);
-      finalText.push(`[ Called ${toolName}]`);
+      // two newlines here to maintain same spacing between timing and assistant message
+      finalText.push(`[ Called ${toolName}]\n\n`);
       console.timeEnd(`${toolName}`);
 
       if (toolResult) {
@@ -142,7 +142,8 @@ export const getAnswer = async (
     }
 
     console.timeEnd("getAnswer");
-    return finalText.join("\n");
+    console.log("");
+    return finalText.join("");
 
     // NOTE: streaming shit
     // const stream = await client.chat.completions.create({
