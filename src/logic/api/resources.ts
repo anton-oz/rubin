@@ -1,11 +1,6 @@
 import OpenAI from "openai";
 
-/**
- * TODO:
- * get this value from a env variable
- * but default to this value
- */
-export const baseURL = "http://localhost:8000/v1";
+export const baseURL = process.env.BASE_URL || "http://localhost:8000/v1";
 
 export async function getTokensUsed(
   model: string,
