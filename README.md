@@ -78,13 +78,19 @@
 git clone git@github.com:anton-oz/rubin
 cd rubin
 pnpm i
+pnpm build:start
+```
 
-# create a local build
-pnpm prod
+### Global Installation
 
-# run the local build
-pnpm main
-
-# or link the build to be available globally
+After downloading dependencies run this command to be able to call `rubin` globally
+```bash
 pnpm link -g
+```
+Make sure to have environment variables set for the base url and convos directory location
+```bash
+export RUBIN_BASE_URL="<your desired base url>"
+# defaults to localhost:8000/v1
+
+export RUBIN_CONVOS_DIR="<your desired convo storage location>"
 ```
