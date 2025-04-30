@@ -6,6 +6,11 @@ import fs from "fs";
 /**
  * NOTE:
  * commonly used filepaths
+ * BUG:
+ * does not resolve in build
+ * defaults to the home directory when installed globally
+ * TODO:
+ * setup env variable for convo path
  */
 export const __filename = fileURLToPath(import.meta.url);
 export const __dirname = path.dirname(__filename);

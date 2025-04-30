@@ -1,5 +1,3 @@
-#!/usr/bin/env tsx
-
 import { getModelName } from "@/logic/api/index";
 import { promptLoop } from "@/logic/prompt";
 import {

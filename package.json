@@ -3,17 +3,28 @@
   "version": "1.0.0",
   "description": "",
   "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    "require": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
   "bin": {
-    "rubin": "./build/index.js"
+    "rubin": "./dist/index.js"
   },
   "scripts": {
-    "build": "pnpm tsc",
-    "build:readme": "comrak --unsafe README.md -o preview.html",
-    "build:watch": "pnpm tsc -w",
+    "build": "pkgroll",
     "build:start": "pnpm build && pnpm start",
-    "start": "pnpm tsx build/index.js",
+    "start": "pnpm node dist/index.js",
     "dev": "pnpm tsx src/index.ts",
-    "prod": "pnpm build && chmod +x build/index.js",
+    "dev:readme": "comrak --unsafe README.md -o preview.html",
     "clean:convos": "rm -rf convos"
   },
   "keywords": [],
@@ -25,6 +36,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
+    "pkgroll": "^2.12.2",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"
   }
