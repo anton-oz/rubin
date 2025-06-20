@@ -4,20 +4,15 @@ import { promises as fsp } from "fs";
 import fs from "fs";
 
 /**
- * NOTE:
- * commonly used filepaths
- * BUG:
- * does not resolve in build
- * defaults to the home directory when installed globally
- * TODO:
- * setup env variable for convo path
+ * __filename and __dirname are needed to get the root path of rubin,
+ * for the default path to convos
  */
-export const __filename = fileURLToPath(import.meta.url);
-export const __dirname = path.dirname(__filename);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-const rootPath = path.resolve(__dirname, "../../../");
-export const srcPath = path.normalize(`${rootPath}/src`);
-export const convosDir = path.normalize(`${rootPath}/convos`);
+export const rootPath = path.resolve(__dirname, "../../../");
+export const convosDir =
+  process.env.RUBIN_CONVOS_DIR || path.normalize(`${rootPath}`);
 
 const dateOptions: Intl.DateTimeFormatOptions = {
   month: "2-digit",

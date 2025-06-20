@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "es2022",
     "module": "es2022",
+    "lib": ["es2022"],
     "moduleResolution": "bundler",
     "outDir": "./build",
     "rootDir": "./src",
@@ -10,7 +11,7 @@
     "noEmit": false,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "skipLibCheck": true,
+    "skipLibCheck": false,
     "forceConsistentCasingInFileNames": true,
     "baseUrl": "./",
     "paths": {

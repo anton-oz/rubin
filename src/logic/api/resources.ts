@@ -20,6 +20,8 @@ export async function getTokensUsed(
     },
   };
   const response = await fetch(`http://localhost:8000/tokenize`, opts);
+  // const data = await response.json();
+  // console.log(`token data: ${JSON.stringify(data, null, 2)}`);
   const { tokens } = await response.json();
   console.log(`Tokens used so far: ${tokens.length}`);
 }

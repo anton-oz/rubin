@@ -2,7 +2,7 @@ import OpenAI from "openai";
 import { convoState } from "../filesystem";
 import { getWeather, getForecast } from "../tools";
 import { tools } from "../tools/toolSchema";
-import { baseURL, getTokensUsed } from "./resources";
+import { baseURL } from "./resources";
 
 const client = new OpenAI({
   baseURL,
