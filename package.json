@@ -20,7 +20,7 @@
     "rubin": "./dist/index.js"
   },
   "scripts": {
-    "build": "pkgroll",
+    "build": "pkgroll --minify",
     "build:start": "pnpm build && pnpm start",
     "start": "pnpm node dist/index.js",
     "dev": "pnpm tsx --env-file=.env --trace-deprecation src/index.ts",
