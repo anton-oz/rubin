@@ -23,9 +23,9 @@
     "build": "pkgroll",
     "build:start": "pnpm build && pnpm start",
     "start": "pnpm node dist/index.js",
-    "dev": "pnpm tsx --env-file=.env src/index.ts",
+    "dev": "pnpm tsx --env-file=.env --trace-deprecation src/index.ts",
     "dev:readme": "comrak --unsafe README.md -o preview.html",
-    "clean:convos": "rm -rf convos"
+    "clean:convos": "rm -rf convos $RUBIN_CONVOS_DIR"
   },
   "keywords": [],
   "author": "",
