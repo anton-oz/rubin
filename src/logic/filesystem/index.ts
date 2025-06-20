@@ -23,7 +23,8 @@ export const convoState = await ConvoState.init();
 
 export async function isConvoEmpty(filePath: string): Promise<boolean> {
   const convo = await readAndParseJson(filePath);
-  if (convo.length === 0) {
+  // NOTE: changed to one for system prompt
+  if (convo.length === 0 || convo[0].role === "system") {
     return true;
   } else {
     return false;
@@ -45,27 +46,6 @@ export async function getLastConvo() {
   };
 
   return lastConvo;
-}
-
-export async function createConvo() {
-  const currentDateDir = convoState.getDateDir();
-  const convos = await dirArray(currentDateDir);
-
-  const newConvoNum = convos.length + 1;
-  const newConvoDir = path.normalize(`${currentDateDir}/${newConvoNum}`);
-  await createDir(newConvoDir);
-  convoState.setNum(newConvoNum);
-  convoState.setDir(newConvoDir);
-  convoState.setHistory([]);
-
-  // init a convo.json to prevent errors when switching conversations
-  fs.writeFile(`${newConvoDir}/convo.json`, "[]", (err) => {
-    if (err) throw err;
-  });
-
-  console.log(`Current convo: ${newConvoNum}`);
-  console.log(`Location: ${newConvoDir}`);
-  console.log("---");
 }
 
 export async function addSystemPromptToConvo(systemPrompt?: string) {
@@ -91,6 +71,29 @@ export async function addSystemPromptToConvo(systemPrompt?: string) {
   fs.writeFile(convoJsonPath, JSON.stringify(convoArr), (err) => {
     if (err) throw err;
   });
+}
+
+export async function createConvo() {
+  const currentDateDir = convoState.getDateDir();
+  const convos = await dirArray(currentDateDir);
+
+  const newConvoNum = convos.length + 1;
+  const newConvoDir = path.normalize(`${currentDateDir}/${newConvoNum}`);
+  await createDir(newConvoDir);
+  convoState.setNum(newConvoNum);
+  convoState.setDir(newConvoDir);
+  convoState.setHistory([]);
+
+  // init a convo.json to prevent errors when switching conversations
+  fs.writeFile(`${newConvoDir}/convo.json`, "[]", (err) => {
+    if (err) throw err;
+  });
+
+  addSystemPromptToConvo();
+
+  console.log(`Current convo: ${newConvoNum}`);
+  console.log(`Location: ${newConvoDir}`);
+  console.log("---");
 }
 
 export async function addQuestionToConvo(questionContent: string) {
