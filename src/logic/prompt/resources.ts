@@ -90,13 +90,20 @@ export async function processCommand(command: Command, rl: readline.Interface) {
 }
 
 /**
+ * BUG:
+ * this input is not sanitized, got to find a way to santize the
+ * arguments sent to child process
+ */
+/**
  * waits for user to stop paging before continuing prompt loop
  *
  * @param file - file to display/page with bat
  */
 export async function asyncBat(file: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const bat = spawn("bat", ["-p", "--file-name markdown", file], {
+    // HACK: not the best way to sanitize, but works for now
+    const sanitizedArgs = `bat -p --file-name markdown ${file.replace(/(["\s'$`\\])/g, "\\$1")}`;
+    const bat = spawn(sanitizedArgs, {
       // dont record any keypresses when paging with bat
       stdio: [null, "inherit", null],
       shell: true,

@@ -1,11 +1,6 @@
 import { getModelName } from "@/logic/api/index";
 import { promptLoop } from "@/logic/prompt";
-import {
-  addSystemPromptToConvo,
-  createConvo,
-  getLastConvo,
-  isConvoEmpty,
-} from "@/logic/filesystem";
+import { createConvo, getLastConvo, isConvoEmpty } from "@/logic/filesystem";
 
 async function main() {
   console.clear();
@@ -15,7 +10,6 @@ async function main() {
   // avoid creating unneccesary convos
   if (!lastConvo || !isEmpty) {
     await createConvo();
-    addSystemPromptToConvo();
   } else {
     console.log(
       `Resuming last convo: ${lastConvo.num} because it was empty.`,
